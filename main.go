@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+
+	"github.com/its-me-sv/rajaraja-web-crawler/internal/utils"
 )
 
 func main() {
@@ -17,4 +19,8 @@ func main() {
 
 	baseURL := args[0]
 	fmt.Printf("starting crawl of: %s\n", baseURL)
+
+	if htmlBody, err := utils.GetHTML(baseURL); err == nil {
+		fmt.Println(htmlBody)
+	}
 }
