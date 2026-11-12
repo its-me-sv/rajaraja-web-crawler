@@ -12,7 +12,7 @@ type PageData struct {
 	ImageURLs      []string
 }
 
-func extractPageData(html, pageURL string) PageData {
+func ExtractPageData(html, pageURL string) PageData {
 	heading := getHeadingFromHTML(html)
 	firstPara := getFirstParagraphFromHTML(html)
 

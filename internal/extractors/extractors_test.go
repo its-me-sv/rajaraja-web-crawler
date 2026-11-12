@@ -14,7 +14,7 @@ func TestExtractPageData(t *testing.T) {
         <img src="/image1.jpg" alt="Image 1">
     </body></html>`
 
-	actual := extractPageData(inputBody, inputURL)
+	actual := ExtractPageData(inputBody, inputURL)
 
 	expected := PageData{
 		URL:            "https://crawler-test.com",
@@ -29,7 +29,7 @@ func TestExtractPageData(t *testing.T) {
 	}
 }
 
-// extractPageData should combine the individual extractors into one PageData.
+// ExtractPageData should combine the individual extractors into one PageData.
 //
 // Expected rules:
 //   - URL is the page URL exactly as passed in (the crawl key is the caller's job)
@@ -333,7 +333,7 @@ func TestExtractPageDataCases(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			actual := extractPageData(tc.inputBody, tc.pageURL)
+			actual := ExtractPageData(tc.inputBody, tc.pageURL)
 			assertPageDataEqual(t, tc.expected, actual)
 		})
 	}

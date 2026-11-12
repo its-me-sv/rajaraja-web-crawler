@@ -5,10 +5,11 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"strings"
 )
 
-func GetHTML(rawURL string) (string, error) {
-	httpClient := http.Client{}
+func getHTML(rawURL string) (string, error) {
+	httpClient := &http.Client{}
 
 	// building request
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, rawURL, nil)
@@ -27,7 +28,7 @@ func GetHTML(rawURL string) (string, error) {
 	if res.StatusCode >= 400 {
 		return "", errors.New("failed to get request")
 	}
-	if res.Header.Get("content-type") != "text/html" {
+	if !strings.Contains(res.Header.Get("content-type"), "text/html") {
 		return "", errors.New("invalid response content")
 	}
 
