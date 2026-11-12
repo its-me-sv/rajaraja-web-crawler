@@ -10,7 +10,7 @@ import (
 // pointing to the same page compare equal. It drops the scheme, default
 // ports, trailing slashes and fragments, lowercases the host, and keeps
 // the path case and query string.
-func normalizeURL(inputURL string) (string, error) {
+func NormalizeURL(inputURL string) (string, error) {
 	trimmed := strings.TrimSpace(inputURL)
 	if trimmed == "" {
 		return "", errors.New("empty URL")

@@ -1,4 +1,4 @@
-package extractors
+package extractor
 
 import (
 	"strings"

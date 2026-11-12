@@ -1,4 +1,4 @@
-package utils
+package crawler
 
 import "net/url"
 

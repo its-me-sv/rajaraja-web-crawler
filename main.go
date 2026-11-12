@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"maps"
 	"os"
+	"slices"
 
-	"github.com/its-me-sv/rajaraja-web-crawler/internal/utils"
+	"github.com/its-me-sv/rajaraja-web-crawler/internal/crawler"
 )
 
 func main() {
@@ -18,10 +20,14 @@ func main() {
 	}
 
 	baseURL := args[0]
-	pages := map[string]int{}
-	utils.CrawlPage(baseURL, baseURL, pages)
-
-	for page, count := range pages {
-		fmt.Println(page, ":", count)
+	crawler, err := crawler.CreateNewConfig(baseURL)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
+
+	crawler.Crawl(baseURL)
+
+	pages := slices.Collect(maps.Keys(crawler.GetPages()))
+	fmt.Println(pages)
 }

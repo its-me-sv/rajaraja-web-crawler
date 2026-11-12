@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func getHTML(rawURL string) (string, error) {
+func GetHTML(rawURL string) (string, error) {
 	httpClient := &http.Client{}
 
 	// building request
