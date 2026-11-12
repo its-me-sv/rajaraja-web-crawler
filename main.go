@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"maps"
 	"os"
+	"runtime"
 	"slices"
 
 	"github.com/its-me-sv/rajaraja-web-crawler/internal/crawler"
@@ -20,7 +21,7 @@ func main() {
 	}
 
 	baseURL := args[0]
-	crawler, err := crawler.CreateNewConfig(baseURL, 16)
+	crawler, err := crawler.CreateNewConfig(baseURL, runtime.NumCPU())
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

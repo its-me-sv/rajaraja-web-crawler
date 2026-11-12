@@ -16,7 +16,12 @@ func (cfg *config) Crawl() {
 }
 
 func (cfg *config) worker(rawCurrentURL string) {
-	defer cfg.wg.Done()
+	cfg.concurrencyControl <- struct{}{}
+	defer func() {
+		<-cfg.concurrencyControl
+		cfg.wg.Done()
+	}()
+
 	fmt.Println("starting crawl of:", rawCurrentURL)
 
 	parsedCurrentURL, err := url.Parse(rawCurrentURL)
@@ -38,29 +43,21 @@ func (cfg *config) worker(rawCurrentURL string) {
 	}
 
 	// do not visit if already visited
-	cfg.mu.Lock()
-	if _, visited := cfg.pages[normalisedCurrentURL]; visited {
+	if !cfg.markVisited(normalisedCurrentURL) {
 		fmt.Println("SKIPPED - already visited")
-		cfg.mu.Unlock()
 		return
 	}
-	cfg.pages[normalisedCurrentURL] = extractor.PageData{}
-	cfg.mu.Unlock()
 
 	// fetching html content of page
-	cfg.concurrencyControl <- struct{}{}
 	html, err := utils.GetHTML(rawCurrentURL)
-	<-cfg.concurrencyControl
 	if err != nil {
 		fmt.Println("SKIPPED - failed to get page content")
 		return
 	}
 
-	// extracting page data
+	// extracting & setting page data
 	pageData := extractor.ExtractPageData(html, rawCurrentURL)
-	cfg.mu.Lock()
-	cfg.pages[normalisedCurrentURL] = pageData
-	cfg.mu.Unlock()
+	cfg.setPageDataForURL(normalisedCurrentURL, pageData)
 
 	// crawling outgoing links
 	for _, outgoingLink := range pageData.OutgoingLinks {

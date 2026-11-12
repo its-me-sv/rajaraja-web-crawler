@@ -34,3 +34,22 @@ func CreateNewConfig(baseURL string, maxConcurrency int) (config, error) {
 func (cfg *config) GetPages() map[string]extractor.PageData {
 	return cfg.pages
 }
+
+func (cfg *config) setPageDataForURL(normalizedURL string, pageData extractor.PageData) {
+	cfg.mu.Lock()
+	defer cfg.mu.Unlock()
+
+	cfg.pages[normalizedURL] = pageData
+}
+
+func (cfg *config) markVisited(normalizedURL string) bool {
+	cfg.mu.Lock()
+	defer cfg.mu.Unlock()
+
+	if _, visited := cfg.pages[normalizedURL]; visited {
+		return false
+	}
+
+	cfg.pages[normalizedURL] = extractor.PageData{}
+	return true
+}
