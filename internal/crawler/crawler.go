@@ -16,15 +16,18 @@ type config struct {
 	wg                 *sync.WaitGroup
 }
 
-func CreateNewConfig(baseURL string) (config, error) {
+func CreateNewConfig(baseURL string, maxConcurrency int) (config, error) {
 	parsedBaseURL, err := url.Parse(baseURL)
 	if err != nil {
 		return config{}, errors.New("not an valid url")
 	}
 
 	return config{
-		pages:   make(map[string]extractor.PageData),
-		baseURL: parsedBaseURL,
+		pages:              make(map[string]extractor.PageData),
+		baseURL:            parsedBaseURL,
+		mu:                 &sync.Mutex{},
+		concurrencyControl: make(chan struct{}, maxConcurrency),
+		wg:                 &sync.WaitGroup{},
 	}, nil
 }
 

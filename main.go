@@ -20,14 +20,14 @@ func main() {
 	}
 
 	baseURL := args[0]
-	crawler, err := crawler.CreateNewConfig(baseURL)
+	crawler, err := crawler.CreateNewConfig(baseURL, 16)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	crawler.Crawl(baseURL)
+	crawler.Crawl()
 
-	pages := slices.Collect(maps.Keys(crawler.GetPages()))
+	pages := slices.Sorted(maps.Keys(crawler.GetPages()))
 	fmt.Println(pages)
 }
