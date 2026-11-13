@@ -7,7 +7,7 @@
   --wall: #5a4b3d;         /* lines and borders */
   --sandstone: #ece2cf;    /* text */
   --dust: #b3a58f;         /* secondary text */
-  --bronze: #cf9a52;       /* links out, primary actions */
+  --bronze: #e0a23c;       /* links out, primary actions */
   --bronze-deep: #a8762f;
   --patina: #7db3a2;       /* links in */
 
@@ -64,8 +64,7 @@ code { font-family: var(--code); font-size: .88em; color: var(--sandstone); }
 .nav { border-bottom: 1px solid var(--wall); }
 .nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; height: 64px; }
 .brand { display: flex; align-items: center; gap: 10px; color: var(--sandstone); text-decoration: none; font-family: var(--display); font-size: 1.35rem; }
-.mark { width: 28px; height: 28px; fill: none; stroke: var(--bronze); stroke-width: 2.5; }
-.mark circle { fill: var(--bronze); stroke: none; }
+.mark { width: 32px; height: 32px; display: block; }
 .nav nav { display: flex; gap: 24px; align-items: center; }
 .nav nav a { color: var(--dust); text-decoration: none; font-size: .95rem; }
 .nav nav a:hover { color: var(--sandstone); }
@@ -109,9 +108,11 @@ code { font-family: var(--code); font-size: .88em; color: var(--sandstone); }
   padding-bottom: 32px;
   align-items: start;
 }
+.title-row { display: flex; align-items: center; gap: clamp(14px, 2vw, 22px); }
+.hero-logo { width: clamp(76px, 9vw, 128px); height: auto; flex: none; filter: drop-shadow(0 6px 18px rgba(0, 0, 0, .35)); }
 .hero h1 {
   font-family: var(--display); font-weight: 400;
-  font-size: clamp(3.6rem, 9vw, 6.6rem); line-height: .95; margin: 0;
+  font-size: clamp(3.2rem, 5.3vw, 5.2rem); line-height: .95; margin: 0;
   letter-spacing: -.01em;
 }
 .tamil-sub { font-family: var(--tamil); color: var(--bronze); font-size: 1.35rem; margin: 10px 0 0; }
@@ -308,7 +309,7 @@ code { font-family: var(--code); font-size: .88em; color: var(--sandstone); }
   .hero > *, .hero-text > * { min-width: 0; }
   .hero-text { display: contents; }
   .board { margin-top: 28px; }
-  .hero h1, .tamil-sub, .lede, .hero .actions, .hero .cmd { grid-column: 1; }
+  .title-row, .tamil-sub, .lede, .hero .actions, .hero .cmd { grid-column: 1; }
   .board { order: 6; }
   .inspector { order: 7; margin-top: 8px; }
   .lede { max-width: 40ch; }

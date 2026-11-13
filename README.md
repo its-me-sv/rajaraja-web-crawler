@@ -10,6 +10,10 @@
 
 <p align="center"><b>Website:</b> <a href="https://rajaraja.surajvijayan.dev">https://rajaraja.surajvijayan.dev</a></p>
 
+<p align="center">
+  <a href="https://rajaraja.surajvijayan.dev"><img src="docs/screenshots/site.png" alt="The Rajaraja website: a real 45 page crawl drawn as a temple plan, with the selected page's report.json entry beside it"></a>
+</p>
+
 ```text
 $ rajaraja-web-crawler https://learnwebscraping.dev/practice/ecommerce/ 5 50
 starting crawl of: https://learnwebscraping.dev/practice/ecommerce/
@@ -326,7 +330,7 @@ Pull requests are welcome. Please keep `go vet` and `go test ./...` passing and 
 ## License
 
 - Code: MIT, see [LICENSE](LICENSE).
-- The Rajaraja logo and the files in `docs/brand/` are not covered by the MIT license. All rights reserved by Suraj Vijayan.
+- The Rajaraja logo and its copies (`docs/brand/`, `site/assets/` and `site/social-preview.png`) are not covered by the MIT license. All rights reserved by Suraj Vijayan.
 
 ## Acknowledgements
 
