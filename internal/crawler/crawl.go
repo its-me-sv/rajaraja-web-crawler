@@ -22,6 +22,11 @@ func (cfg *config) worker(rawCurrentURL string) {
 		cfg.wg.Done()
 	}()
 
+	// stop when max limit reached
+	if cfg.isPagesLimitReached() {
+		return
+	}
+
 	fmt.Println("starting crawl of:", rawCurrentURL)
 
 	parsedCurrentURL, err := url.Parse(rawCurrentURL)

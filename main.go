@@ -4,24 +4,22 @@ import (
 	"fmt"
 	"maps"
 	"os"
-	"runtime"
 	"slices"
 
 	"github.com/its-me-sv/rajaraja-web-crawler/internal/crawler"
+	"github.com/its-me-sv/rajaraja-web-crawler/internal/utils"
 )
 
 func main() {
-	args := os.Args[1:]
-	if len(args) < 1 {
-		fmt.Println("no website provided")
-		os.Exit(1)
-	} else if len(args) > 1 {
-		fmt.Println("too many arguments provided")
+	// parse arguments
+	baseURL, maxConcurrency, maxPages, err := utils.ParseArgs(os.Args)
+	if err != nil {
+		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	baseURL := args[0]
-	crawler, err := crawler.CreateNewConfig(baseURL, runtime.NumCPU())
+	// create crawler instance
+	crawler, err := crawler.CreateNewConfig(baseURL, maxConcurrency, maxPages)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -30,5 +28,7 @@ func main() {
 	crawler.Crawl()
 
 	pages := slices.Sorted(maps.Keys(crawler.GetPages()))
-	fmt.Println(pages)
+	for _, page := range pages {
+		fmt.Println(page)
+	}
 }
