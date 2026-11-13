@@ -5,13 +5,23 @@ import (
 	"strconv"
 )
 
+const Usage = `usage: rajaraja-web-crawler <baseURL> <maxConcurrency> <maxPages>
+example: rajaraja-web-crawler https://example.com 5 100`
+
+var (
+	ErrHelp  = errors.New("help requested")
+	ErrUsage = errors.New("invalid no. of arguments")
+)
+
 func ParseArgs(args []string) (baseURL string, maxConcurrency, maxPages int, err error) {
-	if len(args) < 2 {
-		err = errors.New("insufficient no. of arguments")
-		return
+	for _, arg := range args[1:] {
+		if arg == "-h" || arg == "--help" {
+			err = ErrHelp
+			return
+		}
 	}
-	if len(args) > 4 {
-		err = errors.New("too many arguments")
+	if len(args) != 4 {
+		err = ErrUsage
 		return
 	}
 

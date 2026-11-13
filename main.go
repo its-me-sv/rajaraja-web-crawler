@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -11,6 +12,14 @@ import (
 func main() {
 	// parse arguments
 	baseURL, maxConcurrency, maxPages, err := utils.ParseArgs(os.Args)
+	if errors.Is(err, utils.ErrHelp) {
+		fmt.Println(utils.Usage)
+		os.Exit(0)
+	}
+	if errors.Is(err, utils.ErrUsage) {
+		fmt.Println(utils.Usage)
+		os.Exit(1)
+	}
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
