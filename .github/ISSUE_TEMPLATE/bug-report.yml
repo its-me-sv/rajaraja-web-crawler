@@ -1,0 +1,31 @@
+name: Bug report
+description: The crawler did something you did not expect
+title: "Bug: "
+labels: [bug]
+body:
+  - type: input
+    id: command
+    attributes:
+      label: Command you ran
+      placeholder: rajaraja-web-crawler https://example.com 5 100
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Page or link involved
+      description: Only if it is public. Leave blank otherwise.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what you expected
+      description: Paste the relevant part of the terminal output or report.json if it helps.
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Go version and operating system
+      placeholder: go1.27.1 on Windows 11
+    validations:
+      required: true

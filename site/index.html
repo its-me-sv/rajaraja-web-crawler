@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rajaraja - Web Crawler</title>
+  <meta name="description" content="Map every internal link on a website with one Go binary. Rajaraja crawls a site concurrently, fetches each page exactly once and writes a clean JSON report of headings, intros, links and images.">
+  <meta name="theme-color" content="#2c2722">
+  <link rel="canonical" href="https://rajaraja.surajvijayan.dev/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rajaraja.surajvijayan.dev/">
+  <meta property="og:title" content="Rajaraja - Web Crawler">
+  <meta property="og:description" content="Survey a whole website from one command. Every page once, every link recorded. A fast, concurrent Go crawler.">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Madurai:wght@400;500;600&family=Noto+Serif+Tamil:wght@600&family=Rozha+One&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#survey">Skip to the link map</a>
+
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="#top" aria-label="Rajaraja, back to top">
+        <svg class="mark" viewBox="0 0 40 40" aria-hidden="true"><rect x="3" y="3" width="34" height="34" rx="1"/><rect x="10" y="10" width="20" height="20" rx="1"/><circle cx="20" cy="20" r="4"/></svg>
+        <span>Rajaraja</span>
+      </a>
+      <nav aria-label="Sections">
+        <a href="#questions">Read the report</a>
+        <a href="#worker">How it works</a>
+        <a href="#name">The name</a>
+        <a class="nav-gh" href="https://github.com/its-me-sv/rajaraja-web-crawler">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero wrap">
+      <div class="hero-text">
+        <h1>Rajaraja</h1>
+        <p class="tamil-sub" lang="ta">ராஜராஜ <span lang="en">(Rajaraja, a web crawler in Go)</span></p>
+        <p class="lede">Survey a whole website from one command. Every page fetched once, every link recorded, all in one JSON report.</p>
+        <div class="actions">
+          <a class="btn btn-main" href="https://github.com/its-me-sv/rajaraja-web-crawler#readme">Read the README</a>
+          <a class="btn" href="https://github.com/its-me-sv/rajaraja-web-crawler">View the code on GitHub</a>
+        </div>
+        <div class="cmd" data-copy="go install github.com/its-me-sv/rajaraja-web-crawler@latest">
+          <code><span class="prompt">$</span> go install github.com/its-me-sv/rajaraja-web-crawler@latest</code>
+          <button type="button" class="copy">Copy</button>
+        </div>
+
+        <aside class="inspector" id="inspector" aria-live="polite">
+          <!-- filled by app.js -->
+        </aside>
+      </div>
+
+      <figure class="board" id="survey">
+        <div class="board-head">
+          <p class="board-title">A real crawl of a 45 page practice shop, drawn as a temple plan</p>
+          <button type="button" class="btn btn-small" id="replay">Replay the crawl</button>
+        </div>
+        <div class="map-shell">
+          <svg id="map" viewBox="0 0 1000 1080" role="group" aria-label="Link map: home page at the centre, hub pages on the inner court, product pages on the outer court, other sites outside the wall"></svg>
+        </div>
+        <figcaption class="board-foot">
+          <div class="legend">
+            <span><i class="key key-out"></i>links out of the selected page</span>
+            <span><i class="key key-in"></i>links into it</span>
+          </div>
+          <div class="board-controls">
+            <label class="field">
+              <span>Jump to a page</span>
+              <select id="jump"></select>
+            </label>
+            <label class="check">
+              <input type="checkbox" id="external">
+              <span>Show links to other sites</span>
+            </label>
+          </div>
+          <p class="note">Rings by role: home in the centre, hub pages one court out, each product beside its category. Replay shows pages in the order links lead to them, over 2.4 seconds, the time the real crawl took with five workers.</p>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="facts wrap" aria-label="Crawl results">
+      <p><b>45</b> pages, <b>394</b> links read and <b>2.4</b> seconds with five workers. Not one page fetched twice. One third-party library.</p>
+    </section>
+
+    <section class="section wrap" id="questions">
+      <div class="section-head">
+        <h2>Ask the report anything</h2>
+        <p>Rajaraja hands you raw material, not a verdict. One JSON file, five fields per page, ready for <a href="https://jqlang.org">jq</a>, a spreadsheet or a graph tool. These answers are computed live from the crawl above.</p>
+        <button type="button" class="btn btn-small" id="download">Download this report.json</button>
+      </div>
+      <div class="recipes">
+        <div class="recipe-tabs" role="tablist" aria-label="Questions" id="recipe-tabs"></div>
+        <div class="recipe-body" role="tabpanel" id="recipe-panel" tabindex="0">
+          <div class="cmd cmd-block" id="recipe-cmd">
+            <code></code>
+            <button type="button" class="copy">Copy</button>
+          </div>
+          <p class="result-label">On this crawl</p>
+          <pre class="result" id="recipe-result"></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section wrap" id="worker">
+      <div class="section-head">
+        <h2>What one worker does</h2>
+        <p>Every link gets its own goroutine. Each one runs these steps, and dozens run at once. The hard part is steps 1 and 4: sharing one map between racing workers without fetching a page twice or passing the page limit.</p>
+      </div>
+      <div class="worker-grid">
+        <ol class="steps">
+          <li><h3>Wait for a free slot</h3><p>A buffered channel works as a semaphore, so only <code>maxConcurrency</code> workers fetch at a time.</p><span class="prim">chan struct{}</span></li>
+          <li><h3>Stay on the site</h3><p>Links to another hostname are listed in the report but never fetched.</p></li>
+          <li><h3>Turn the URL into a page key</h3><p>Scheme, fragment, default port and trailing slash go, so <code>http://Example.com/a/</code> and <code>https://example.com/a#top</code> are one page.</p></li>
+          <li><h3>Claim the page and check the limit</h3><p>Both happen inside one locked section, so two workers can never take the same page or overshoot <code>maxPages</code>.</p><span class="prim">sync.Mutex</span></li>
+          <li><h3>Fetch it</h3><p>One shared HTTP client with pooled connections, a 7 second timeout and the user agent <code>RajarajaWebCrawler/1.0</code>. Only HTML pages pass.</p></li>
+          <li><h3>Read the page</h3><p>Main heading, first paragraph, every link and every image, parsed with goquery.</p></li>
+          <li><h3>Start a worker for every link, then free the slot</h3><p>The crawl ends when the last worker finishes, with no queue to close.</p><span class="prim">sync.WaitGroup</span></li>
+        </ol>
+        <div class="speed">
+          <h3>Same 45 pages, two settings</h3>
+          <div class="bar-row">
+            <span class="bar-label">1 worker</span>
+            <div class="bar"><span style="--w:100%"></span></div>
+            <span class="bar-val">8.56 s</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-label">5 workers</span>
+            <div class="bar"><span class="bar-fast" style="--w:28%"></span></div>
+            <span class="bar-val">2.40 s</span>
+          </div>
+          <p>About 3.6 times faster, and the two reports were identical byte for byte. Measured on a home connection in India.</p>
+          <p>I built Rajaraja to learn Go concurrency hands on, while working on my key-value store <a href="https://github.com/its-me-sv/double-distributed-kv">double-distributed-kv</a>. A crawler needs goroutines, channels, mutexes and WaitGroups all at once.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section wrap name" id="name">
+      <div class="inscription" lang="ta" aria-hidden="true">ராஜராஜ சோழன்</div>
+      <div class="section-head">
+        <h2>Named after an emperor who surveyed his empire</h2>
+        <p><span lang="ta">ராஜராஜ சோழன்</span> is written Rajaraja Chozhan and said RAH-jah-RAH-jah CHOH-zhun. Rajaraja Chola I ruled from 985 to 1014 and built the great temple at Thanjavur. Around the year 1000 he began a survey and assessment of the land across his empire, and the land was reorganised into new revenue divisions. An officer called Kuravan Ulagalandan led the work, and the results were cut into the stone walls of temples. Later rulers updated the survey from time to time.</p>
+      </div>
+      <table class="then-now">
+        <caption>The survey then, the crawl now</caption>
+        <thead><tr><th scope="col">Then</th><th scope="col">Now</th></tr></thead>
+        <tbody>
+          <tr><td><span class="ta" lang="ta">வளநாடு</span> <b>valanadu</b>, "fertile land": the divisions the survey drew</td><td>The site boundary: one hostname</td></tr>
+          <tr><td><span class="ta" lang="ta">உலகளந்தான்</span> <b>Ulagalandan</b>, "he who measured the world": the officer who ran the survey</td><td>The workers that walk the site in parallel</td></tr>
+          <tr><td>Every plot measured once and recorded</td><td>Every page fetched once and recorded</td></tr>
+          <tr><td>Records cut into temple walls</td><td><code>report.json</code></td></tr>
+          <tr><td>The survey revisited by later rulers</td><td>Run it again whenever the site changes</td></tr>
+        </tbody>
+      </table>
+      <p class="sources">Sources: <a href="https://en.wikipedia.org/wiki/Rajaraja_I">Rajaraja I</a>, <a href="https://en.wikipedia.org/wiki/Chola_government">Chola government</a>, <a href="https://de.wisdomlib.org/south-asia/book/middle-chola-temples/d/doc210447.html">Middle Chola Temples</a>.</p>
+    </section>
+
+    <section class="section wrap limits" id="limits">
+      <div class="section-head">
+        <h2>What it does not do yet</h2>
+        <p>Rajaraja maps what a site links to. It does not judge it, and it says so.</p>
+      </div>
+      <ul class="limit-list">
+        <li><b>No JavaScript rendering.</b> Single-page apps without server rendering show up as one page with no links.</li>
+        <li><b>No robots.txt or crawl delay.</b> Crawl sites you own or are allowed to, and start with one or two workers.</li>
+        <li><b>Broken links and redirects are not reported.</b> Failed pages are left out, and redirects are followed silently.</li>
+        <li><b>No depth limit.</b> The page cap is the only bound, and capped crawls can pick different pages each run.</li>
+        <li><b>Some markup is ignored:</b> title, meta description, canonical, meta robots, nofollow and the base tag.</li>
+      </ul>
+    </section>
+
+    <section class="section wrap closing">
+      <h2>Map your own site</h2>
+      <p>Build it from source in under a minute. Flags, the report format, design choices and the full list of rules are in the README.</p>
+      <div class="cmd cmd-block" data-copy="git clone https://github.com/its-me-sv/rajaraja-web-crawler.git
+cd rajaraja-web-crawler
+go build -o rajaraja-web-crawler .
+./rajaraja-web-crawler https://example.com 2 100">
+        <code><span class="prompt">$</span> git clone https://github.com/its-me-sv/rajaraja-web-crawler.git
+<span class="prompt">$</span> cd rajaraja-web-crawler
+<span class="prompt">$</span> go build -o rajaraja-web-crawler .
+<span class="prompt">$</span> ./rajaraja-web-crawler https://example.com 2 100</code>
+        <button type="button" class="copy">Copy</button>
+      </div>
+      <div class="actions">
+        <a class="btn btn-main" href="https://github.com/its-me-sv/rajaraja-web-crawler#readme">Read the README</a>
+        <a class="btn" href="https://github.com/its-me-sv/rajaraja-web-crawler">Star it on GitHub</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot-inner">
+      <p>Rajaraja - Web Crawler, built by <a href="https://www.linkedin.com/in/suraj-vijay-32b679224/">Suraj Vijayan</a>. Code under the MIT license. The Rajaraja logo is not covered by it.</p>
+      <p>The map shows a real crawl of the <a href="https://learnwebscraping.dev/practice/ecommerce/">learnwebscraping.dev</a> practice shop, a site made for scraping practice. Page text belongs to its owner.</p>
+      <p><a href="https://surajvijayan.dev">More from Suraj at surajvijayan.dev</a></p>
+    </div>
+  </footer>
+
+  <script src="data/report.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

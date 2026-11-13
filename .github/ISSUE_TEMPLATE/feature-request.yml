@@ -1,0 +1,17 @@
+name: Feature request
+description: Suggest something Rajaraja should record or do
+title: "Idea: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: What do you want to find out about a site?
+      description: The question you are trying to answer, such as "which pages redirect" or "which pages have no title".
+    validations:
+      required: true
+  - type: textarea
+    id: shape
+    attributes:
+      label: How would you like it to appear?
+      description: A new field in report.json, a new flag, a new output format, or something else.

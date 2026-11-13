@@ -91,11 +91,11 @@ rajaraja-web-crawler <baseURL> <maxConcurrency> <maxPages>
 
 All three arguments are required, in this order. Run it with `-h` or `--help` to print the usage text; any other number of arguments prints it too and exits with code 1.
 
-| Argument         | What it does                                                               | Rule                                      |
-| ---------------- | -------------------------------------------------------------------------- | ----------------------------------------- |
-| `baseURL`        | Where the crawl starts. Its hostname decides which links count as internal | A full URL, such as `https://example.com` |
-| `maxConcurrency` | How many pages can be fetched at the same time                             | Whole number, 1 or more                   |
-| `maxPages`       | The most pages the report will hold                                        | Whole number, 1 or more                   |
+| Argument | What it does | Rule |
+| --- | --- | --- |
+| `baseURL` | Where the crawl starts. Its hostname decides which links count as internal | A full URL, such as `https://example.com` |
+| `maxConcurrency` | How many pages can be fetched at the same time | Whole number, 1 or more |
+| `maxPages` | The most pages the report will hold | Whole number, 1 or more |
 
 Examples:
 
@@ -109,15 +109,15 @@ rajaraja-web-crawler https://example.com 5 500
 
 While it runs, the terminal shows a progress log:
 
-| Line                                   | Meaning                                   |
-| -------------------------------------- | ----------------------------------------- |
-| `starting crawl of: <url>`             | A worker picked up a link                 |
-| `SKIPPED - not part of base URL`       | The link points to another host           |
-| `SKIPPED - page already visited`       | That page was already fetched or claimed  |
+| Line | Meaning |
+| --- | --- |
+| `starting crawl of: <url>` | A worker picked up a link |
+| `SKIPPED - not part of base URL` | The link points to another host |
+| `SKIPPED - page already visited` | That page was already fetched or claimed |
 | `SKIPPED - failed to get page content` | Error status, timeout or not an HTML page |
-| `SKIPPED - invalid page URL`           | The link could not be parsed              |
-| `STOPPED - limit reached`              | `maxPages` is full                        |
-| `report saved to file: report.json`    | Done                                      |
+| `SKIPPED - invalid page URL` | The link could not be parsed |
+| `STOPPED - limit reached` | `maxPages` is full |
+| `report saved to file: report.json` | Done |
 
 Workers run at the same time, so log lines interleave. The program exits with code 0 when the report is saved, and 1 if the arguments are invalid or the report cannot be written. Pages that fail during the crawl are skipped and do not change the exit code.
 
@@ -139,13 +139,13 @@ Every run writes `report.json` in the current folder, replacing any earlier one.
 }
 ```
 
-| Field             | What it holds                                                                                                             |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `url`             | The page URL as it was linked                                                                                             |
-| `heading`         | Text of the first `h1`, or the first `h2` if there is no `h1`. Empty if neither exists                                    |
-| `first_paragraph` | Text of the first `p` inside `<main>`, or the first `p` on the page                                                       |
-| `outgoing_links`  | Every `<a href>` on the page as an absolute `http` or `https` URL, internal and external, in page order, repeats included |
-| `image_urls`      | Every `<img src>` as an absolute `http` or `https` URL                                                                    |
+| Field | What it holds |
+| --- | --- |
+| `url` | The page URL as it was linked |
+| `heading` | Text of the first `h1`, or the first `h2` if there is no `h1`. Empty if neither exists |
+| `first_paragraph` | Text of the first `p` inside `<main>`, or the first `p` on the page |
+| `outgoing_links` | Every `<a href>` on the page as an absolute `http` or `https` URL, internal and external, in page order, repeats included |
+| `image_urls` | Every `<img src>` as an absolute `http` or `https` URL |
 
 Only pages that were fetched successfully as HTML appear in the report.
 
@@ -221,10 +221,10 @@ Because Rajaraja does not read robots.txt or pause between requests, you are in 
 
 Measured on a home connection in India against the 45-page practice site above:
 
-| Command                            | Pages |   Time |
-| ---------------------------------- | ----: | -----: |
-| `rajaraja-web-crawler <site> 1 50` |    45 | 8.56 s |
-| `rajaraja-web-crawler <site> 5 50` |    45 | 2.40 s |
+| Command | Pages | Time |
+| --- | ---: | ---: |
+| `rajaraja-web-crawler <site> 1 50` | 45 | 8.56 s |
+| `rajaraja-web-crawler <site> 5 50` | 45 | 2.40 s |
 
 Five workers were about 3.6 times faster than one, and both reports were byte for byte identical.
 
@@ -232,13 +232,13 @@ Five workers were about 3.6 times faster than one, and both reports were byte fo
 
 Rajaraja Chola I, in Tamil **ராஜராஜ சோழன்** (Rajaraja Chozhan), ruled the Chola empire from 985 to 1014 and built the great Rajarajeshwaram temple at Thanjavur. Around the year 1000 he began a survey and assessment of the land across his empire, and the land was reorganised into revenue divisions as a result. The work was led by an officer called Kuravan Ulagalandan, a title read as "he who measured the world", and the records were cut into the stone walls of temples. Later rulers updated the survey from time to time.
 
-| Then                                                                                      | Now                                        |
-| ----------------------------------------------------------------------------------------- | ------------------------------------------ |
-| **வளநாடு** (valanadu, "fertile land"), the divisions the survey drew                      | The site boundary: one hostname            |
+| Then | Now |
+| --- | --- |
+| **வளநாடு** (valanadu, "fertile land"), the divisions the survey drew | The site boundary: one hostname |
 | **உலகளந்தான்** (Ulagalandan, "he who measured the world"), the officer who ran the survey | The workers that walk the site in parallel |
-| Every plot measured once and recorded                                                     | Every page fetched once and recorded       |
-| Records cut into temple walls                                                             | `report.json`                              |
-| The survey revisited by later rulers                                                      | Run it again whenever the site changes     |
+| Every plot measured once and recorded | Every page fetched once and recorded |
+| Records cut into temple walls | `report.json` |
+| The survey revisited by later rulers | Run it again whenever the site changes |
 
 Sources: [Rajaraja I](https://en.wikipedia.org/wiki/Rajaraja_I), [Chola government](https://en.wikipedia.org/wiki/Chola_government), [Middle Chola Temples on the Rajaraja survey](https://de.wisdomlib.org/south-asia/book/middle-chola-temples/d/doc210447.html).
 
@@ -260,11 +260,11 @@ The test suite has 163 tests and subtests covering URL normalisation and every H
 
 ### Dependencies
 
-| Module                                                            | Why                                                                                                |
-| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| [goquery](https://github.com/PuerkitoBio/goquery)                 | CSS selectors over parsed HTML, so each extractor is a few lines (`a[href]`, `img[src]`, `main p`) |
-| [cascadia](https://github.com/andybalholm/cascadia)               | Selector engine behind goquery (indirect)                                                          |
-| [golang.org/x/net/html](https://pkg.go.dev/golang.org/x/net/html) | Standards-based HTML parser behind goquery (indirect)                                              |
+| Module | Why |
+| --- | --- |
+| [goquery](https://github.com/PuerkitoBio/goquery) | CSS selectors over parsed HTML, so each extractor is a few lines (`a[href]`, `img[src]`, `main p`) |
+| [cascadia](https://github.com/andybalholm/cascadia) | Selector engine behind goquery (indirect) |
+| [golang.org/x/net/html](https://pkg.go.dev/golang.org/x/net/html) | Standards-based HTML parser behind goquery (indirect) |
 
 Everything else is the Go standard library.
 
@@ -291,15 +291,15 @@ site/                       the project website (static HTML, CSS and JS, no bui
 
 ### Design choices
 
-| Choice                                                                              | Instead of                                | Why                                                                                                                                                                                 |
-| ----------------------------------------------------------------------------------- | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A goroutine per link, gated by a semaphore and a WaitGroup                          | A fixed worker pool reading from a queue  | Fits a crawl where every page discovers more work. The crawl is done when the WaitGroup reaches zero, with no queue closing logic. The trade is more goroutines on link-heavy sites |
-| One map and one lock, with "check limit and claim URL" in a single critical section | `sync.Map` plus a separate counter        | Racing workers can never overshoot `maxPages` or fetch a page twice                                                                                                                 |
-| Normalised keys that keep the query string and path case                            | Stripping queries, lowercasing everything | Queries and path case can change the page, so merging them could hide real pages                                                                                                    |
-| One shared HTTP client with idle connections sized to `maxConcurrency`              | A client per request                      | Connection reuse avoids repeated TLS handshakes                                                                                                                                     |
-| goquery                                                                             | Raw tokenizer or regular expressions      | A real HTML5 parser copes with broken markup, and selectors keep extractors short                                                                                                   |
-| Indented JSON sorted by URL                                                         | CSV or streaming output                   | Pages hold lists of links and images, which JSON represents naturally, and sorting makes uncapped runs reproducible                                                                 |
-| Everything under `internal/`                                                        | Public packages                           | It is a tool, not a library, for now                                                                                                                                                |
+| Choice | Instead of | Why |
+| --- | --- | --- |
+| A goroutine per link, gated by a semaphore and a WaitGroup | A fixed worker pool reading from a queue | Fits a crawl where every page discovers more work. The crawl is done when the WaitGroup reaches zero, with no queue closing logic. The trade is more goroutines on link-heavy sites |
+| One map and one lock, with "check limit and claim URL" in a single critical section | `sync.Map` plus a separate counter | Racing workers can never overshoot `maxPages` or fetch a page twice |
+| Normalised keys that keep the query string and path case | Stripping queries, lowercasing everything | Queries and path case can change the page, so merging them could hide real pages |
+| One shared HTTP client with idle connections sized to `maxConcurrency` | A client per request | Connection reuse avoids repeated TLS handshakes |
+| goquery | Raw tokenizer or regular expressions | A real HTML5 parser copes with broken markup, and selectors keep extractors short |
+| Indented JSON sorted by URL | CSV or streaming output | Pages hold lists of links and images, which JSON represents naturally, and sorting makes uncapped runs reproducible |
+| Everything under `internal/` | Public packages | It is a tool, not a library, for now |
 
 ## The website
 
