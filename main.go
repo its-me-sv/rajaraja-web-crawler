@@ -2,9 +2,7 @@ package main
 
 import (
 	"fmt"
-	"maps"
 	"os"
-	"slices"
 
 	"github.com/its-me-sv/rajaraja-web-crawler/internal/crawler"
 	"github.com/its-me-sv/rajaraja-web-crawler/internal/utils"
@@ -27,8 +25,11 @@ func main() {
 
 	crawler.Crawl()
 
-	pages := slices.Sorted(maps.Keys(crawler.GetPages()))
-	for _, page := range pages {
-		fmt.Println(page)
+	// writing report to file
+	filename := "report.json"
+	if err := utils.WriteJSONReport(crawler.GetPages(), filename); err != nil {
+		fmt.Println("failed to save report to file:", filename)
+		os.Exit(1)
 	}
+	fmt.Println("report saved to file:", filename)
 }
