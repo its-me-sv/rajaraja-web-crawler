@@ -2,10 +2,13 @@ package crawler
 
 import (
 	"errors"
+	"net/http"
 	"net/url"
 	"sync"
+	"time"
 
 	"github.com/its-me-sv/rajaraja-web-crawler/internal/extractor"
+	"github.com/its-me-sv/rajaraja-web-crawler/internal/utils"
 )
 
 type config struct {
@@ -15,6 +18,7 @@ type config struct {
 	concurrencyControl chan struct{}
 	wg                 *sync.WaitGroup
 	maxPages           int
+	httpClient         *http.Client
 }
 
 func CreateNewConfig(baseURL string, maxConcurrency, maxPages int) (config, error) {
@@ -30,6 +34,10 @@ func CreateNewConfig(baseURL string, maxConcurrency, maxPages int) (config, erro
 		return config{}, errors.New("maxPages must at least be 1")
 	}
 
+	// configuring http client's no. of idle connections
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	transport.MaxIdleConnsPerHost = maxConcurrency
+
 	return config{
 		pages:              make(map[string]extractor.PageData),
 		baseURL:            parsedBaseURL,
@@ -37,13 +45,11 @@ func CreateNewConfig(baseURL string, maxConcurrency, maxPages int) (config, erro
 		concurrencyControl: make(chan struct{}, maxConcurrency),
 		wg:                 &sync.WaitGroup{},
 		maxPages:           maxPages,
+		httpClient: &http.Client{
+			Timeout:   7 * time.Second,
+			Transport: transport,
+		},
 	}, nil
-}
-
-func (cfg *config) isPagesLimitReached() bool {
-	cfg.mu.Lock()
-	defer cfg.mu.Unlock()
-	return len(cfg.pages) >= cfg.maxPages
 }
 
 func (cfg *config) GetPages() map[string]extractor.PageData {
@@ -57,14 +63,29 @@ func (cfg *config) setPageDataForURL(normalizedURL string, pageData extractor.Pa
 	cfg.pages[normalizedURL] = pageData
 }
 
-func (cfg *config) markVisited(normalizedURL string) bool {
+func (cfg *config) unsetPageDataForURL(normalizedURL string) {
 	cfg.mu.Lock()
 	defer cfg.mu.Unlock()
 
-	if _, visited := cfg.pages[normalizedURL]; visited {
-		return false
+	delete(cfg.pages, normalizedURL)
+}
+
+func (cfg *config) markVisitedWhenMaxPageNotReached(normalizedURL string) (limitReached, claimed bool) {
+	cfg.mu.Lock()
+	defer cfg.mu.Unlock()
+
+	if len(cfg.pages) >= cfg.maxPages {
+		return true, false
+	}
+
+	if _, exists := cfg.pages[normalizedURL]; exists {
+		return false, false
 	}
 
 	cfg.pages[normalizedURL] = extractor.PageData{}
-	return true
+	return false, true
+}
+
+func (cfg *config) fetchHTMLContent(rawURL string) (string, error) {
+	return utils.GetHTML(cfg.httpClient, rawURL)
 }

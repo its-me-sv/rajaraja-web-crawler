@@ -22,11 +22,6 @@ func (cfg *config) worker(rawCurrentURL string) {
 		cfg.wg.Done()
 	}()
 
-	// stop when max limit reached
-	if cfg.isPagesLimitReached() {
-		return
-	}
-
 	fmt.Println("starting crawl of:", rawCurrentURL)
 
 	parsedCurrentURL, err := url.Parse(rawCurrentURL)
@@ -47,16 +42,22 @@ func (cfg *config) worker(rawCurrentURL string) {
 		return
 	}
 
-	// do not visit if already visited
-	if !cfg.markVisited(normalisedCurrentURL) {
-		fmt.Println("SKIPPED - already visited")
+	// do not visit if already visited or limit reached
+	limitReached, claimed := cfg.markVisitedWhenMaxPageNotReached(normalisedCurrentURL)
+	if limitReached {
+		fmt.Println("STOPPED - limit reached")
+		return
+	}
+	if !claimed {
+		fmt.Println("SKIPPED - page already visited")
 		return
 	}
 
 	// fetching html content of page
-	html, err := utils.GetHTML(rawCurrentURL)
+	html, err := cfg.fetchHTMLContent(rawCurrentURL)
 	if err != nil {
 		fmt.Println("SKIPPED - failed to get page content")
+		cfg.unsetPageDataForURL(normalisedCurrentURL)
 		return
 	}
 
